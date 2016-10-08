@@ -7,7 +7,10 @@ using System.Collections.Generic;
 public class DynamicCreatePolygonMesh : MonoBehaviour
 {
 	[SerializeField]
-	private Material _mat;
+	private Material _PolygonMaterial;
+
+	[SerializeField]
+	private Material _LineMaterial;
 
 	//頂点数
 	[SerializeField]
@@ -24,6 +27,13 @@ public class DynamicCreatePolygonMesh : MonoBehaviour
 			return;
 		}
 
+
+		CreatePolygon ();
+		CreateLine ();
+	}
+
+	void CreatePolygon ()
+	{
 		List<Vector3> vertices = new List<Vector3> ();
 		List<int> triangles = new List<int> ();
 
@@ -49,6 +59,29 @@ public class DynamicCreatePolygonMesh : MonoBehaviour
 		filter.sharedMesh = mesh;
 
 		var renderer = GetComponent<MeshRenderer> ();
-		renderer.material = _mat;
+		renderer.material = _PolygonMaterial;
 	}
+
+	void CreateLine ()
+	{
+		List<Vector3> vertices = new List<Vector3> ();
+
+		var renderer = GetComponent<LineRenderer> ();
+		renderer.material = _LineMaterial;
+		renderer.startWidth = 0.1f;
+		renderer.endWidth = 0.1f;
+		renderer.useWorldSpace = false;
+
+		renderer.numPositions = this.VerticesCount + 1;
+
+		//各頂点座標
+		for (int i = 0; i <= this.VerticesCount; i++) {
+			float rad = (90f - (360f / (float)this.VerticesCount) * (i - 1)) * Mathf.Deg2Rad;
+			float x = Mathf.Cos (rad);
+			float y = Mathf.Sin (rad);
+
+			renderer.SetPosition (i, new Vector3 (x, y, 0));
+		}
+	}
+
 }
